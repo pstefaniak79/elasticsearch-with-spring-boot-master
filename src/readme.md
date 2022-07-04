@@ -601,6 +601,50 @@ POST /my_store/products
 
 }
 
+POST /log/_search?typed_keys=true
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "user.full_name": { "value": "abob"}   }    }
+        
+        
+      ],
+      "must_not": [
+        { "exists": { "field": "event.category.keyword" } }
+        ]
+    }
+  }
+}
 
 
 
+POST people/_search
+{
+  "aggs": {
+    "city": {
+      "terms": {
+        "field" : "city.keyword"
+      },
+      "aggs": {
+        "all_count" : {
+          "value_count" : {
+            "field" : "city.keyword"
+          }
+        },
+        "count_bucket_filter" : {
+          "bucket_selector" : {
+            "buckets_path" : {
+              "all_count" : "all_count"
+            },
+            "script" : "params.all_count >= 4"
+          }
+        }
+      }
+    }
+   
+  
+  },
+  "size" : 0
+  
+}
